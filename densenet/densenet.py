@@ -50,3 +50,20 @@ class DenseNet(nn.Module):
         x= self.linear(x)
 
         return x
+
+def densenet121():
+    return DenseNet(DenseBlock, [6,12,24,16], 10, growth_rate=32)
+
+def densenet169():
+    return DenseNet(DenseBlock, [6,12,32,32], 10, growth_rate=32)
+
+def densenet201():
+    return DenseNet(DenseBlock, [6,12,48,32], 10, growth_rate=32)
+
+def densenet161():
+    return DenseNet(DenseBlock, [6,12,36,24], 10, growth_rate=48)
+
+
+model= densenet121()
+data= torch.randn((1, 3, 224, 224))
+export_onnx(model, data, 'desenet.onnx')
