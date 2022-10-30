@@ -1,6 +1,3 @@
-from cmath import exp
-import sys
-sys.path.append('')
 import torch
 import torch.nn as nn
 from utils.conv import ConvBn, ConvBnAct, BnActConv
@@ -79,3 +76,11 @@ class DenseTransition(nn.Module):
         return x
 
 
+# class ResNextBlock(nn.Module):
+#     def __init__(self, in_c, out_c, s):
+#         super().__init__()
+#         C= 32
+#         DEPTH= 4
+#         BASEWIDTH= 64
+
+#         D= 

@@ -1,3 +1,5 @@
+import sys
+sys.path.append("")
 import torch
 import torch.nn as nn
 from utils.conv import ConvBn, ConvBnAct, BnActConv
@@ -39,7 +41,7 @@ class DenseNet(nn.Module):
             in_c += self.growth_rate
         
         return dense_block
-        
+
     def forward(self, x):
         x= self.conv1(x)
         x= self.features(x)
@@ -48,5 +50,3 @@ class DenseNet(nn.Module):
         x= self.linear(x)
 
         return x
-
-
