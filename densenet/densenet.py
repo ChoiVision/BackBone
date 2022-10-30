@@ -66,4 +66,4 @@ def densenet161():
 
 model= densenet121()
 data= torch.randn((1, 3, 224, 224))
-export_onnx(model, data, 'desenet.onnx')
+export_onnx(model, data, 'desenet121.onnx')

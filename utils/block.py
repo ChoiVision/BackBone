@@ -76,11 +76,26 @@ class DenseTransition(nn.Module):
         return x
 
 
-# class ResNextBlock(nn.Module):
-#     def __init__(self, in_c, out_c, s):
-#         super().__init__()
-#         C= 32
-#         DEPTH= 4
-#         BASEWIDTH= 64
+class ResNextBlock(nn.Module):
+    expansion= 2
+    def __init__(self, in_c, group_width, caradinality, s=1):
+        super().__init__()
+        self.conv= nn.Sequential(
+            ConvBnAct(in_c= in_c, out_c= group_width, k= 1, s= s, p=None),
+            ConvBnAct(in_c= group_width, out_c= group_width, k= 3, s= 1, p= 1, groups= caradinality),
+            ConvBn(in_c= group_width, out_c= group_width * self.expansion, k= 1, s= 1, p=None)
+        )
 
-#         D= 
+        self.act= nn.ReLU()
+        self.shortcut= nn.Sequential()
+
+        if s != 1 or in_c != group_width * self.expansion:
+            self.shortcut= ConvBnAct(in_c, group_width * self.expansion, k= 1, s= s, p=None)
+
+    def forward(self, x):
+        x= self.conv(x) + self.shortcut(x)
+        x= self.act(x)
+
+        return x
+
+    
