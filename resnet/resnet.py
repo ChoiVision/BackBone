@@ -1,13 +1,16 @@
+import sys
+sys.path.append('')
 import torch
 import torch.nn as nn
 from utils.conv import ConvBn, ConvBnAct
 from utils.block import ResnetBlock, ResnetBottleNeck
+from utils.convert_onnx import export_onnx
 
 class Stem(nn.Module):
     def __init__(self, in_c, out_c, k, s):
         super().__init__()
-        self.stem= ConvBnAct(in_c, out_c, k, s)
-        self.pool= nn.MaxPool2d(k= 3, s= 2)
+        self.stem= ConvBnAct(in_c, out_c, k, s, p=None)
+        self.pool= nn.MaxPool2d(kernel_size= 3, stride= 2)
 
     def forward(self, x):
         x= self.stem(x)
@@ -29,11 +32,11 @@ class ResNet(nn.Module):
         self.pool= nn.AdaptiveAvgPool2d((1, 1))
         self.fc= nn.Linear(512 * block.expansion, num_classes)
 
-    def _create_layer(self, block, out_c, num_blocks, s):
+    def _create_layer(self, block, out_c, num_blocks, s, k):
         strides= [s] + [1] * (num_blocks -1)
         layers= []
         for s in strides:
-            layers.append(block(self.in_c, out_c, s))
+            layers.append(block(self.in_c, out_c, s, k))
             self.in_c= out_c * block.expansion
 
     def forward(self, x):
@@ -47,3 +50,22 @@ class ResNet(nn.Module):
         x= self.fc(x)
 
         return x
+
+def resnet18():
+    return ResNet(ResnetBlock, [2,2,2,2], 10)
+
+def resnet34():
+    return ResNet(ResnetBlock, [3, 4, 6, 3], 10)
+
+def resnet50():
+    return ResNet(ResnetBottleNeck, [3,4,6,3], 10)
+
+def resnet101():
+    return ResNet(ResnetBottleNeck, [3, 4, 23, 3], 10)
+
+def resnet152():
+    return ResNet(ResnetBottleNeck, [3, 8, 36, 3], 10)
+
+
+model= resnet18()
+export_onnx(model, torch.randn((1, 3, 224, 224)), 'resnet.onnx')
