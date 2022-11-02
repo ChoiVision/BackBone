@@ -99,3 +99,14 @@ class ResNextBlock(nn.Module):
         return x
 
     
+class DepthSeperableBlock(nn.Module):
+    def __init__(self, in_c, out_c, s, **kwargs):
+        super().__init__()
+        self.depthwise= ConvBnAct(in_c= in_c, out_c= out_c, k= 3, s= s, p= 1, groups= in_c)
+        self.pointwise= ConvBnAct(in_c= in_c, out_c= out_c, k= 1, s= 1, p= None)
+
+    def forward(self, x):
+        x= self.depthwise(x)
+        x= self.pointwise(x)
+
+        return x
