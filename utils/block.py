@@ -110,3 +110,21 @@ class DepthSeperableBlock(nn.Module):
         x= self.pointwise(x)
 
         return x
+
+class SEBlock(nn.Moduel):
+    def __init__(self, in_c, r= 16):
+        super().__init__()
+        self.squeeze= nn.AdaptiveAvgPool2d(1)
+        self.excitation= nn.Sequential(
+            nn.Linear(in_c, in_c//r, bias= False),
+            nn.ReLU(True),
+            nn.Linear(in_c // r, in_c, bias= False),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        x= self.squeeze(x)
+        x= self.excitation(x)
+        x= x.view(x.size(0), x.size(1), 1, 1)
+
+        return x
